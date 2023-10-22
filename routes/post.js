@@ -15,12 +15,6 @@ router.use(express.json());               //Used express.json() to enable JSON p
 const ifHasMore = (page, limit, totalItems) => (page * limit) < totalItems;
 
 
-//Handled the root route with a response to check if the server is working.
-router.get("/", async (req, res) => {
-    res.send( 'Node Server is Running.')
-} )
-
-
 //Implemented an API key authentication middleware to secure specific routes.
 const apiKeyAuthMiddleware = (req, res, next) => {
   const providedApiKey = req.headers['x-api-key'];//Checking for a valid API key in the request headers.

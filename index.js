@@ -11,6 +11,11 @@ app.use('/v1', postRoutes);                   // Using the '/post' prefix for th
 app.use('/insert', postSamples);                  // Using the '/insert' prefix for the POST datas from the json
 
 
+//Handled the root route with a response to check if the server is working.
+app.get("/", async (req, res) => {
+  res.send( 'Node Server is Running.')
+} )
+
 //Start the server, specifying the port as either from the environment variable or a default value.
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
