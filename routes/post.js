@@ -1,24 +1,22 @@
 
-const express = require('express');             //Imported Express and created an instance of the application.
-const app = express();                // Create a router instead of an app
+const express = require('express');             //Imported Express and created an instance of the routerlication.
+const router = express.Router();                        // Create a router instead of an router
 const multer = require('multer');               // Import the 'multer' library for handling file uploads
 const path = require('path');                   // Import the 'path' module for working with file paths
-const cors = require('cors');                   //Enabled CORS (Cross-Origin Resource Sharing) for your server.
 const { dbData } = require('../models/PostSchema');  //Imported the database model from './models/Schema'.
 const apiKey = process.env.API_KEY;             //apiKey for auithentication 
-          
+           
 
 require('dotenv').config();                   //Loaded environment variables from a .env file using dotenv.
-app.use(cors());
-app.use(express.json());                //Used express.json() to enable JSON parsing for incoming requests.
+router.use(express.json());               //Used express.json() to enable JSON parsing for incoming requests.
 
 
 // Calculate whether there are more pages to load (Pagination info)
-const ifhasMore = (page, limit, totalItems) => (page * limit) < totalItems;
+const ifHasMore = (page, limit, totalItems) => (page * limit) < totalItems;
 
 
 //Handled the root route with a response to check if the server is working.
-app.get("/", async (req, res) => {
+router.get("/", async (req, res) => {
     res.send( 'Node Server is Running.')
 } )
 
@@ -34,7 +32,7 @@ const apiKeyAuthMiddleware = (req, res, next) => {
 };
 
 //Created a new data entry with API key authentication.
-app.post('/createPost', apiKeyAuthMiddleware, async (req, res) => {
+router.post('/createPost', apiKeyAuthMiddleware, async (req, res) => {
     try {
       const { title, description, image, price, tags } = req.body;
       
@@ -69,7 +67,7 @@ app.post('/createPost', apiKeyAuthMiddleware, async (req, res) => {
 //Implemented various routes for creating, retrieving, filtering with tags, sorting data and pagination.
 
 // Retrieve all data entries at once.
-app.get('/getAllData', async (req, res) => {
+router.get('/getAllData', async (req, res) => {
     try {
   
       // Query your data source to retrieve all data
@@ -87,7 +85,7 @@ app.get('/getAllData', async (req, res) => {
   
   
   // Retrieve data entries with pagination.
-  app.get('/getPaginatedData', async (req, res) => {
+  router.get('/getPaginatedData', async (req, res) => {
     try {
   
       // Parsed the 'page' and 'limit' query parameter from the request URL, or default to 1 and 2 if not provided
@@ -104,7 +102,7 @@ app.get('/getAllData', async (req, res) => {
       const totalItems = await dbData.countDocuments();
   
       // Send the retrieved data and pagination metadata as a JSON response
-      res.json({ data: allData, hasMore:ifhasMore(page, limit, totalItems), totalItems });
+      res.json({ data: allData, hasMore:ifHasMore(page, limit, totalItems), totalItems });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -113,7 +111,7 @@ app.get('/getAllData', async (req, res) => {
   
   
   // Retrieve and sort data entries by price with pagination.
-  app.get('/getSortedDataByPrice', async (req, res) => {
+  router.get('/getSortedDataByPrice', async (req, res) => {
     try {
       const sortDirection = req.query.sort || 'asc';     /* Default to ascending if sort direction 
                                                           is not provided*/
@@ -125,7 +123,7 @@ app.get('/getAllData', async (req, res) => {
       }
   
       // Query your data source and sort by 'price' based on the sort direction
-      //applying pagination
+      //routerlying pagination
   
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 2;
@@ -138,7 +136,7 @@ app.get('/getAllData', async (req, res) => {
       const totalItems = await dbData.countDocuments();
   
       // Send the sorted data as a JSON response
-      res.json({data:sortedData, hasMore:ifhasMore(page, limit, totalItems), totalItems});
+      res.json({data:sortedData, hasMore:ifHasMore(page, limit, totalItems), totalItems});
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -146,12 +144,12 @@ app.get('/getAllData', async (req, res) => {
   
   
   // Search for data entries by title or description with pagination.
-  app.get('/searchItems', async (req, res) => {
+  router.get('/searchItems', async (req, res) => {
     try {
       const searchText = req.query.searchText; // Get the search text from query parameters
   
       // Query your data source to search for items by description or title
-      //applying pagination
+      //routerlying pagination
   
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
@@ -177,7 +175,7 @@ app.get('/getAllData', async (req, res) => {
   
   
       // Send the search results as a JSON response
-      res.status(200).json({data:searchResult,hasMore:ifhasMore(page, limit, totalItems), totalItems});
+      res.status(200).json({data:searchResult,hasMore:ifHasMore(page, limit, totalItems), totalItems});
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -185,14 +183,14 @@ app.get('/getAllData', async (req, res) => {
   
   
   // Filter data entries by tags with pagination.
-  app.get('/filterByTag', async (req, res) => {
+  router.get('/filterByTag', async (req, res) => {
     try {
       const tags = req.query.tags; // Get the tags to filter by from the query parameters
   
       // Convert tags to an array if they are provided as a comma-separated string
      const tagArray = Array.isArray(tags) ? tags : tags.split(',');
   
-     //applying pagination
+     //routerlying pagination
      const page = parseInt(req.query.page) || 1;
      const limit = parseInt(req.query.limit) || 2;
   
@@ -205,7 +203,7 @@ app.get('/getAllData', async (req, res) => {
       const totalItems = await dbData.countDocuments({ tags: { $in: tagArray } });
   
       // Send the filtered data as a JSON response
-      res.status(200).json({data:filteredData,hasMore:ifhasMore(page, limit, totalItems),totalItems});
+      res.status(200).json({data:filteredData,hasMore:ifHasMore(page, limit, totalItems),totalItems});
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
@@ -218,7 +216,7 @@ const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 // Configure multer storage for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Specify the directory where uploaded files will be stored
+    cb(null, 'assets/'); // Specify the directory where uploaded files will be stored
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname); // Use the original file name as the name of the stored file
@@ -244,7 +242,7 @@ const storage = multer.diskStorage({
   });
   
   // API for file upload with Authorization middleware
-  app.post('/upload',apiKeyAuthMiddleware,(req, res) => {
+  router.post('/upload',apiKeyAuthMiddleware,(req, res) => {
     try {
       upload.single('image')(req, res, (err) => {
         if (err) {
@@ -260,4 +258,7 @@ const storage = multer.diskStorage({
     }
   });
 
-module.exports = app; // Export the router
+
+ 
+
+module.exports = router; // Export the router

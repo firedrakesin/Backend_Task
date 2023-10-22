@@ -26,8 +26,9 @@ const postSchema = new mongoose.Schema({
   tags: [String], // Define 'tags' as an array of strings
 });
 
+
 // Created a Mongoose model based on the schema for 'Post' data
-const dbData = mongoose.model('Post', postSchema);
+const dbData = mongoose.model('Books', postSchema);
 
 // Exported the Mongoose model for external use
 module.exports = { dbData };
