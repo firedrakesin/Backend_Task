@@ -11,6 +11,13 @@ require('dotenv').config();                   //Loaded environment variables fro
 router.use(express.json());               //Used express.json() to enable JSON parsing for incoming requests.
 
 
+var admin = require("firebase-admin");
+var serviceAccount = require("path/to/serviceAccountKey.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+
 // Calculate whether there are more pages to load (Pagination info)
 const ifHasMore = (page, limit, totalItems) => (page * limit) < totalItems;
 
